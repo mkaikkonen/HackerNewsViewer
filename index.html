@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <style>
+            body {
+                padding-top: 50px;
+                padding-bottom: 20px;
+            }
+            
+            .jumbotron {
+                margin-bottom: 0px;
+                background-image: url(jumbotron.png);
+                background-position: 0% 25%;
+                background-size: cover;
+                background-repeat: no-repeat;
+                color: white;
+                text-shadow: black 0.3em 0.3em 0.3em;
+            }
+        </style>
+        <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="css/main.css">
+
+        <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="https://cdn.firebase.com/js/client/1.1.0/firebase.js"></script>
+        <script>
+            // Create List items and link news to them
+            function initContainer(){
+                createTable();
+                readNews();
+            }           
+            
+            function createTable(){
+                
+                var items = [];
+                
+                items.push("<tr><th>Score</th><th>Article</th><th>Comment</th></tr>");
+            
+                for(var i = 0; i < 10; i++){
+                    // Create entry
+                    items.push("<tr><td><a href=\"#\" id=\"tableScore_" + i + "\">Score</td>"+ 
+                        "<td><a href=\"#\" id=\"tableArticle_" + i + "\">Article</td>"+
+                        "<td><a href=\"#\" id=\"tableComment_" + i + "\">Comment</td></tr>");
+                }
+                
+                console.log(items.join(" "));
+                // Set list in place
+                document.getElementById("article_table").innerHTML = items.join(" ");               
+            }
+            
+                        // Update list item content
+            function updateTableRow(snapshot, index){
+                var item = snapshot.val();                         
+                
+                document.getElementById("tableScore_" + index).innerHTML = 
+                        item.score.toString();
+                
+                var anchor = document.getElementById("tableArticle_" + index)
+                anchor.innerHTML = item.title;           
+                anchor.href = item.url;
+                
+                document.getElementById("tableComment_" + index).href =
+                    "https://news.ycombinator.com/item?id=" + item.id;
+            }            
+
+            
+            // Create firebase and link items to list
+            // Based on example from https://www.firebase.com/blog/2014-10-07-hacker-news-api-is-firebase.html
+            function readNews(){
+                var ref = new Firebase("https://hacker-news.firebaseio.com/v0/");
+                
+                for(var i = 0; i < 10; i++){
+                    registerToNews(ref, i);              
+                }
+            }
+            
+            // Handle child element spesified by the index
+            function registerToNews(ref, index){
+                var itemRef;                                                
+                
+                ref.child('topstories').child(index).on('value', function(snapshot) {
+                    if(itemRef) {
+                         itemRef.off();
+                    }
+                    
+                    //Get the ID of the top article
+                    var id = snapshot.val();
+                    
+                    //Get the article details and update in realtime
+                    itemRef = ref.child('item').child(id);
+                    
+                    itemRef.on('value', function(snapshot) {
+                        updateTableRow(snapshot, index);});            
+                    });
+            }           
+        </script>
+        
+    </head>
+    <body onload="initContainer()">
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Hacker News viewer</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+
+    <div class="container">
+
+    <div class="jumbotron">
+      <div class="container">
+        <h1>Hacker News viewer!</h1>              
+      </div>
+    </div>
+
+      <hr>
+
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">News</div>
+        <div class="panel-body">
+            You can check the Hacker News main page from <a href="https://news.ycombinator.com/news">here</a>.
+        </div>
+
+        <!-- Table -->
+        <table id="article_table" class="table">
+        </table>
+      </div>
+      
+      <footer>
+          <p>&copy; Mika Kaikkonen 2014. This page uses <a href="https://www.firebase.com/blog/2014-10-07-hacker-news-api-is-firebase.html">Hacker News API</a></p>
+      </footer>
+    </div> <!-- /container -->        
+    
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.1.js"><\/script>');</script>
+    <script src="js/vendor/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+    </body>
+</html>

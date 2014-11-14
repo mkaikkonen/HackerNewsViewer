@@ -39,25 +39,26 @@
                 readNews();
             }           
             
-            function createTable(){
-                
+            // Create table
+            function createTable(){               
                 var items = [];
                 
-                items.push("<tr><th>Score</th><th>Article</th><th>Comment</th></tr>");
+                // Create column headers
+                items.push("<tr><th>Score</th><th>Article</th><th>Type</th><th>Comment</th></tr>");
             
+                // Create rows
                 for(var i = 0; i < 10; i++){
-                    // Create entry
                     items.push("<tr><td><a href=\"#\" id=\"tableScore_" + i + "\">Score</td>"+ 
                         "<td><a href=\"#\" id=\"tableArticle_" + i + "\">Article</td>"+
+                        "<td><a href=\"#\" id=\"tableType_" + i + "\">Type</td>"+
                         "<td><a href=\"#\" id=\"tableComment_" + i + "\">Comment</td></tr>");
                 }
                 
-                console.log(items.join(" "));
-                // Set list in place
+                // Set table in place
                 document.getElementById("article_table").innerHTML = items.join(" ");               
             }
             
-                        // Update list item content
+            // Update table content
             function updateTableRow(snapshot, index){
                 var item = snapshot.val();                         
                 
@@ -65,8 +66,11 @@
                         item.score.toString();
                 
                 var anchor = document.getElementById("tableArticle_" + index)
-                anchor.innerHTML = item.title;           
+                anchor.innerHTML = item.title;
                 anchor.href = item.url;
+
+                document.getElementById("tableType_" + index).innerHTML = 
+                    item.type;
                 
                 document.getElementById("tableComment_" + index).href =
                     "https://news.ycombinator.com/item?id=" + item.id;
@@ -139,7 +143,7 @@
         <!-- Default panel contents -->
         <div class="panel-heading">News</div>
         <div class="panel-body">
-            You can check the Hacker News main page from <a href="https://news.ycombinator.com/news">here</a>.
+            Check the Hacker News main page from <a href="https://news.ycombinator.com/news">here</a>.
         </div>
 
         <!-- Table -->
